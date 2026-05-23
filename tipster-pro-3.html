@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Tipster Pro"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<title>Tipster Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0a0a0f;color:#e2e8f0;font-family:'DM Mono','Courier New',monospace;overscroll-behavior:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0a0a0f}::-webkit-scrollbar-thumb{background:#22c55e44;border-radius:2px}
+.tk{font-family:'Bebas Neue',cursive;letter-spacing:.05em}
+.glow{text-shadow:0 0 20px #22c55e88}
+.card{background:#0f1117;border:1px solid #1e2533;border-radius:12px}
+input,select,textarea{background:#0a0a0f;border:1px solid #1e2533;color:#e2e8f0;border-radius:8px;padding:11px 14px;font-family:inherit;font-size:14px;outline:none;width:100%;transition:border-color .2s;-webkit-appearance:none}
+input:focus,select:focus{border-color:#22c55e66}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.btn{border:none;border-radius:10px;padding:12px 20px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .15s;letter-spacing:.08em;text-transform:uppercase;-webkit-appearance:none}
+.btng{background:#22c55e;color:#0a0a0f}.btng:active{background:#16a34a;transform:scale(.97)}
+.btns{background:transparent;color:#64748b;border:1px solid #1e2533}.btns:active{background:#ffffff08}
+.btnr{background:#ef444411;color:#ef4444;border:1px solid #ef444433}.btnr:active{background:#ef444422}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.06em}
+.pb{height:8px;background:#1e2533;border-radius:4px;overflow:hidden}
+.pbf{height:100%;background:linear-gradient(90deg,#22c55e,#86efac);border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.pbf::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:sh 2.5s infinite}
+@keyframes sh{to{left:100%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fadeup{animation:fadeup .3s ease-out}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:#0f1117;border:1px solid #22c55e22;border-radius:20px 20px 0 0;padding:20px 18px 44px;width:100%;max-width:600px;max-height:94vh;overflow-y:auto}
+.modal-handle{width:40px;height:4px;background:#1e2533;border-radius:2px;margin:0 auto 18px}
+.lbl{font-size:10px;color:#64748b;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#0c0e14;border-top:1px solid #1e2533;display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;cursor:pointer;border:none;background:transparent;color:#475569;font-family:inherit;font-size:9px;letter-spacing:.08em;text-transform:uppercase;gap:4px;transition:color .2s}
+.bnav-btn.active{color:#22c55e}
+.bnav-btn .ico{font-size:20px;line-height:1}
+.header{background:linear-gradient(180deg,#0f1117,#0a0a0f);border-bottom:1px solid #1e2533;padding:16px 16px 12px;padding-top:calc(16px + env(safe-area-inset-top))}
+.content{padding-bottom:calc(82px + env(safe-area-inset-bottom));min-height:100vh}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:12px}
+.stat-card{background:#0f1117;border:1px solid #1e2533;border-radius:12px;padding:16px}
+.bet-row{padding:14px 16px;border-bottom:1px solid #1e253866}
+.bet-row:last-child{border-bottom:none}
+.bet-row:active{background:#ffffff03}
+.action-btn{border:none;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.06em}
+.toast{position:fixed;top:calc(20px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:#22c55e;color:#0a0a0f;padding:10px 22px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.06em;z-index:200;animation:fadeup .3s ease-out;white-space:nowrap;box-shadow:0 4px 20px #22c55e44}
+/* LEG CARD */
+.leg-card{background:#080b10;border:1px solid #1e2533;border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.leg-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.leg-num{font-size:10px;color:#22c55e;letter-spacing:.12em;font-weight:600}
+/* TYPE TOGGLE */
+.type-toggle{display:flex;gap:0;background:#080b10;border:1px solid #1e2533;border-radius:10px;padding:3px;margin-bottom:14px}
+.type-btn{flex:1;padding:9px 0;text-align:center;border:none;background:transparent;color:#64748b;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;border-radius:8px;letter-spacing:.06em;transition:all .2s}
+.type-btn.active{background:#22c55e;color:#0a0a0f}
+/* ODDS PREVIEW BOX */
+.odds-box{background:#0a140a;border:1px solid #22c55e22;border-radius:10px;padding:14px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const GOAL=150000,BASE_BK=1000;
+const CATS={Calcio:"#22c55e",Tennis:"#f59e0b",Basket:"#f97316",Horse:"#8b5cf6","MMA/UFC":"#ef4444",Altro:"#64748b"};
+const fmt=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(n);
+const fmtDate=d=>new Date(d).toLocaleDateString("it-IT",{day:"2-digit",month:"short",year:"numeric"});
+const fmtCd=ms=>{if(ms<=0)return"ORA IN CAMPO";const s=Math.floor(ms/1000),m=Math.floor(s/60)%60,h=Math.floor(s/3600)%24,d=Math.floor(s/86400);if(d>0)return`${d}g ${h}h ${m}m`;if(h>0)return`${h}h ${m}m`;return`${m}m ${s%60}s`;};
+
+const SAMPLE=[
+  {id:1,date:"2025-01-10",type:"single",description:"Juventus vs Milan — 1X",category:"Calcio",stake:200,odds:1.85,result:"win",matchDate:"",matchTime:"",legs:[]},
+  {id:2,date:"2025-01-15",type:"multiple",description:"Doppia Tennis",category:"Tennis",stake:300,odds:3.78,result:"win",matchDate:"",matchTime:"",legs:[{match:"Sinner vs Djokovic",pick:"Sinner",category:"Tennis",odds:"1.90"},{match:"Alcaraz vs Zverev",pick:"Alcaraz",category:"Tennis",odds:"1.99"}]},
+  {id:3,date:"2025-01-20",type:"single",description:"Inter vs Napoli — Over 2.5",category:"Calcio",stake:300,odds:1.70,result:"loss",matchDate:"",matchTime:"",legs:[]},
+  {id:4,date:"2025-02-05",type:"multiple",description:"Tripla NBA",category:"Basket",stake:150,odds:6.12,result:"win",matchDate:"",matchTime:"",legs:[{match:"Lakers vs Warriors",pick:"Lakers",category:"Basket",odds:"1.90"},{match:"Celtics vs Heat",pick:"Celtics",category:"Basket",odds:"1.75"},{match:"Nuggets vs Suns",pick:"Over 218.5",category:"Basket",odds:"1.85"}]},
+  {id:5,date:"2025-02-18",type:"single",description:"Roma vs Lazio — BTTS",category:"Calcio",stake:250,odds:1.90,result:"loss",matchDate:"",matchTime:"",legs:[]},
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let state={bets:[],tab:0,filter:"all",showForm:false,editId:null,form:emptyForm(),toast:null,expandedBet:null};
+
+function emptyForm(){
+  return{date:new Date().toISOString().split("T")[0],type:"single",description:"",category:"Calcio",stake:"",odds:"",result:"pending",matchDate:"",matchTime:"",legs:[emptyLeg()]};
+}
+function emptyLeg(){return{match:"",pick:"",category:"Calcio",odds:""};}
+
+// ── STORAGE ────────────────────────────────────────────────────────────────────
+function load(){try{const r=localStorage.getItem("tipster-v3");if(r){const p=JSON.parse(r);if(Array.isArray(p)&&p.length)return p;}}catch(_){}return[...SAMPLE];}
+function save(b){try{localStorage.setItem("tipster-v3",JSON.stringify(b));}catch(_){}}
+state.bets=load();
+
+// ── STATS ──────────────────────────────────────────────────────────────────────
+function calcStats(bets){
+  const closed=bets.filter(b=>b.result!=="pending");
+  const staked=closed.reduce((s,b)=>s+b.stake,0);
+  const ret=closed.reduce((s,b)=>b.result==="win"?s+b.stake*b.odds:s,0);
+  const net=ret-staked;
+  const wins=closed.filter(b=>b.result==="win").length;
+  const losses=closed.filter(b=>b.result==="loss").length;
+  const pending=bets.filter(b=>b.result==="pending").length;
+  const roi=staked>0?((net/staked)*100).toFixed(2):0;
+  const wr=closed.length>0?((wins/closed.length)*100).toFixed(1):0;
+  const bankroll=BASE_BK+net;
+  const progress=Math.min((Math.max(bankroll,0)/GOAL)*100,100);
+  const pendStake=bets.filter(b=>b.result==="pending").reduce((s,b)=>s+b.stake,0);
+  const pendPot=bets.filter(b=>b.result==="pending").reduce((s,b)=>s+b.stake*(b.odds-1),0);
+  return{staked,net,wins,losses,pending,roi,wr,bankroll,progress,pendStake,pendPot,total:bets.length};
+}
+
+// ── COMPUTED ODDS FOR MULTIPLE ─────────────────────────────────────────────────
+function totalOdds(legs){return legs.reduce((a,l)=>a*(parseFloat(l.odds)||1),1);}
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+let cdInterval=null;
+function startCd(){if(cdInterval)clearInterval(cdInterval);cdInterval=setInterval(()=>{if(state.bets.some(b=>b.result==="pending"&&b.matchDate))render();},1000);}
+startCd();
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg,color){state.toast={msg,color:color||"#22c55e"};render();setTimeout(()=>{state.toast=null;render();},2500);}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function setResult(id,result){state.bets=state.bets.map(b=>b.id===id?{...b,result}:b);save(state.bets);showToast(result==="win"?"✓ WIN registrato!":"✗ LOSS registrato",result==="win"?"#22c55e":"#ef4444");}
+function deleteBet(id){if(!confirm("Eliminare questa scommessa?"))return;state.bets=state.bets.filter(b=>b.id!==id);save(state.bets);render();}
+function editBet(bet){
+  state.form={...bet,stake:String(bet.stake),odds:String(bet.odds),legs:bet.legs&&bet.legs.length?bet.legs.map(l=>({...l})):[emptyLeg()]};
+  state.editId=bet.id;state.showForm=true;render();
+}
+function submitForm(){
+  const f=state.form;
+  if(!f.stake)return;
+  let finalOdds,finalDesc,finalCat;
+  if(f.type==="multiple"){
+    if(f.legs.some(l=>!l.match||!l.odds||!l.pick))return;
+    finalOdds=+totalOdds(f.legs).toFixed(3);
+    finalDesc=f.description||`Multipla ${f.legs.length} eventi`;
+    finalCat=f.legs[0].category;
+  } else {
+    if(!f.description||!f.odds)return;
+    finalOdds=+f.odds;finalDesc=f.description;finalCat=f.category;
+  }
+  const entry={...f,stake:+f.stake,odds:finalOdds,description:finalDesc,category:finalCat,legs:f.type==="multiple"?f.legs:[]};
+  if(state.editId!==null){state.bets=state.bets.map(b=>b.id===state.editId?{...entry,id:state.editId}:b);}
+  else{state.bets=[...state.bets,{...entry,id:Date.now()}];}
+  save(state.bets);
+  state.form=emptyForm();state.editId=null;state.showForm=false;
+  showToast(state.editId!==null?"✓ Aggiornata":"✓ Scommessa aggiunta!");
+}
+function closeForm(){state.showForm=false;state.editId=null;state.form=emptyForm();render();}
+
+// ── EL HELPER ─────────────────────────────────────────────────────────────────
+function el(tag,cls,text,styles){
+  const e=document.createElement(tag||"div");
+  if(cls)e.className=cls;
+  if(text&&typeof text==="string")e.textContent=text;
+  if(Array.isArray(text))text.forEach(([k,v])=>e.style[k]=v);
+  if(Array.isArray(styles))styles.forEach(([k,v])=>e.style[k]=v);
+  return e;
+}
+function inp(id,type,placeholder,value,extra){
+  const i=document.createElement("input");
+  i.id=id;i.type=type||"text";
+  if(placeholder)i.placeholder=placeholder;
+  if(value!==undefined&&value!==null)i.value=value;
+  if(extra)Object.assign(i,extra);
+  return i;
+}
+function sel(id,options,value){
+  const s=document.createElement("select");s.id=id;
+  options.forEach(o=>{const op=document.createElement("option");op.value=o;op.textContent=o;if(o===value)op.selected=true;s.appendChild(op);});
+  return s;
+}
+function field(label,child,mb){
+  const w=el("div","",[["marginBottom",mb||"12px"]]);
+  w.appendChild(el("div","lbl",label));w.appendChild(child);return w;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(buildHeader());
+  app.appendChild(buildContent());
+  app.appendChild(buildBottomNav());
+  if(state.showForm)app.appendChild(buildModal());
+  if(state.toast){
+    const t=el("div","toast",state.toast.msg);
+    t.style.background=state.toast.color||"#22c55e";
+    t.style.color=state.toast.color==="#ef4444"?"#fff":"#0a0a0f";
+    app.appendChild(t);
+  }
+  attachEvents();
+}
+
+// ── HEADER ────────────────────────────────────────────────────────────────────
+function buildHeader(){
+  const stats=calcStats(state.bets);
+  const h=el("div","header");
+  const row=el("div","",[["display","flex"],["justifyContent","space-between"],["alignItems","center"]]);
+  const L=el("div");
+  L.appendChild(el("div","tk glow","TIPSTER PRO",[["fontSize","28px"],["color","#22c55e"],["lineHeight","1"]]));
+  L.appendChild(el("div","","BANKROLL TRACKER — OBIETTIVO €150.000",[["fontSize","9px"],["color","#334155"],["letterSpacing",".16em"],["marginTop","3px"]]));
+  const R=el("div","",[["display","flex"],["gap","14px"],["alignItems","center"]]);
+  const bk=el("div","",[["textAlign","right"]]);
+  bk.appendChild(el("div","","BANKROLL",[["fontSize","9px"],["color","#475569"],["letterSpacing",".1em"]]));
+  bk.appendChild(el("div","tk",fmt(stats.bankroll),[["fontSize","20px"],["color",stats.bankroll>=BASE_BK?"#22c55e":"#ef4444"]]));
+  const gl=el("div","",[["textAlign","right"]]);
+  gl.appendChild(el("div","","GOAL",[["fontSize","9px"],["color","#475569"],["letterSpacing",".1em"]]));
+  gl.appendChild(el("div","tk glow",stats.progress.toFixed(1)+"%",[["fontSize","20px"],["color","#f59e0b"]]));
+  R.appendChild(bk);R.appendChild(gl);row.appendChild(L);row.appendChild(R);h.appendChild(row);
+  if(stats.pending>0){
+    const pill=el("div","","● "+stats.pending+" PENDING",[["fontSize","10px"],["color","#f59e0b"],["background","#f59e0b11"],["border","1px solid #f59e0b33"],["borderRadius","8px"],["padding","5px 12px"],["marginTop","10px"],["display","inline-block"],["letterSpacing",".08em"],["animation","pulse 1.5s infinite"]]);
+    h.appendChild(pill);
+  }
+  return h;
+}
+
+// ── CONTENT ───────────────────────────────────────────────────────────────────
+function buildContent(){
+  const div=el("div","content fadeup");
+  if(state.tab===0)div.appendChild(buildDashboard());
+  else if(state.tab===1)div.appendChild(buildBetList());
+  else if(state.tab===2)div.appendChild(buildAddTab());
+  return div;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function buildDashboard(){
+  const stats=calcStats(state.bets);
+  const div=el("div");
+  // Goal bar
+  const gc=el("div","card",[["margin","16px"],["padding","20px"],["borderColor","#22c55e22"]]);
+  const gt=el("div","",[["display","flex"],["justifyContent","space-between"],["alignItems","flex-end"],["marginBottom","12px"]]);
+  const gL=el("div");
+  gL.appendChild(el("div","","PROGRESSO OBIETTIVO",[["fontSize","9px"],["color","#475569"],["letterSpacing",".12em"],["marginBottom","6px"]]));
+  gL.appendChild(el("div","tk",fmt(Math.max(stats.bankroll,0)),[["fontSize","20px"]]));
+  gL.appendChild(el("div","","/ "+fmt(GOAL),[["fontSize","11px"],["color","#334155"],["marginTop","2px"]]));
+  gt.appendChild(gL);
+  gt.appendChild(el("div","tk glow",stats.progress.toFixed(1)+"%",[["fontSize","40px"],["color","#22c55e"]]));
+  gc.appendChild(gt);
+  const pb=el("div","pb");const pbf=el("div","pbf");pbf.style.width=stats.progress+"%";pb.appendChild(pbf);gc.appendChild(pb);
+  gc.appendChild(el("div","","Mancano "+fmt(Math.max(GOAL-stats.bankroll,0))+" al traguardo",[["fontSize","11px"],["color","#475569"],["marginTop","8px"]]));
+  div.appendChild(gc);
+  // Stats
+  const sg=el("div","stat-grid");
+  [{label:"P/L Netto",val:(stats.net>=0?"+":"")+fmt(stats.net),col:stats.net>=0?"#22c55e":"#ef4444"},{label:"ROI",val:(+stats.roi>=0?"+":"")+stats.roi+"%",col:+stats.roi>=0?"#22c55e":"#ef4444"},{label:"Win Rate",val:stats.wr+"%",col:"#f59e0b"},{label:"Pending",val:String(stats.pending),col:"#f59e0b"}].forEach(s=>{
+    const sc=el("div","stat-card");
+    sc.appendChild(el("div","",s.label,[["fontSize","9px"],["color","#475569"],["letterSpacing",".12em"],["textTransform","uppercase"],["marginBottom","8px"]]));
+    sc.appendChild(el("div","tk",s.val,[["fontSize","24px"],["color",s.col],["lineHeight","1"]]));
+    sg.appendChild(sc);
+  });
+  div.appendChild(sg);
+  // Wins / Losses / Multiple
+  const wl=el("div","stat-grid");
+  [{label:"Vittorie",val:stats.wins,col:"#22c55e",sub:"vinte"},{label:"Sconfitte",val:stats.losses,col:"#ef4444",sub:"perse"}].forEach(s=>{
+    const sc=el("div","stat-card",[["display","flex"],["alignItems","center"],["gap","14px"]]);
+    sc.appendChild(el("div","tk",String(s.val),[["fontSize","40px"],["color",s.col],["lineHeight","1"]]));
+    const info=el("div");info.appendChild(el("div","",s.label,[["fontSize","13px"]]));info.appendChild(el("div","",s.sub,[["fontSize","11px"],["color","#475569"]]));
+    sc.appendChild(info);wl.appendChild(sc);
+  });
+  div.appendChild(wl);
+  // Multiple count
+  const multiples=state.bets.filter(b=>b.type==="multiple").length;
+  const mc=el("div","stat-card",[["margin","0 16px 12px"],["display","flex"],["alignItems","center"],["gap","14px"]]);
+  mc.appendChild(el("div","tk",String(multiples),[["fontSize","40px"],["color","#f59e0b"],["lineHeight","1"]]));
+  const mi=el("div");mi.appendChild(el("div","","Multiple",[]));mi.appendChild(el("div","","combo bet",[["fontSize","11px"],["color","#475569"]]));mc.appendChild(mi);
+  div.appendChild(mc);
+  // Pending section
+  if(stats.pending>0){
+    const pc=el("div","card",[["margin","0 16px 16px"],["borderColor","#f59e0b44"],["overflow","hidden"]]);
+    const ph=el("div","",[["padding","12px 16px"],["borderBottom","1px solid #f59e0b22"],["display","flex"],["justifyContent","space-between"],["alignItems","center"],["flexWrap","wrap"],["gap","6px"]]);
+    ph.appendChild(el("div","","⏳ "+stats.pending+" SCOMMESSE PENDING",[["fontSize","10px"],["color","#f59e0b"],["letterSpacing",".1em"]]));
+    ph.appendChild(el("div","","Pot. +"+fmt(stats.pendPot),[["fontSize","11px"],["color","#22c55e"]]));
+    pc.appendChild(ph);
+    state.bets.filter(b=>b.result==="pending").forEach(b=>pc.appendChild(buildBetRow(b)));
+    div.appendChild(pc);
+  }
+  return div;
+}
+
+// ── BET LIST ──────────────────────────────────────────────────────────────────
+function buildBetList(){
+  const div=el("div");
+  const fb=el("div","",[["display","flex"],["gap","6px"],["padding","14px 16px 10px"],["overflowX","auto"]]);
+  ["all","pending","win","loss","multiple"].forEach(f=>{
+    const isA=state.filter===f;
+    const bg=isA?(f==="win"?"#22c55e":f==="loss"?"#ef4444":f==="pending"?"#f59e0b":f==="multiple"?"#f97316":"#1e2533"):"transparent";
+    const col=isA?(f==="all"?"#e2e8f0":"#0a0a0f"):"#64748b";
+    const label=f==="all"?"Tutte":f==="win"?"✓ Vinte":f==="loss"?"✗ Perse":f==="pending"?"⏳ Pending":"✦ Multiple";
+    const btn=el("button","btn",label,[["background",bg],["color",col],["border","1px solid "+(isA?"transparent":"#1e2533")],["padding","7px 14px"],["fontSize","10px"],["borderRadius","8px"],["flexShrink","0"]]);
+    btn.dataset.filter=f;fb.appendChild(btn);
+  });
+  div.appendChild(fb);
+  const listCard=el("div","card",[["margin","0 16px"],["overflow","hidden"]]);
+  let filtered=state.bets;
+  if(state.filter==="multiple")filtered=state.bets.filter(b=>b.type==="multiple");
+  else if(state.filter!=="all")filtered=state.bets.filter(b=>b.result===state.filter);
+  if(filtered.length===0){listCard.appendChild(el("div","","Nessuna scommessa",[["padding","40px"],["textAlign","center"],["color","#475569"],["fontSize","13px"]]));}
+  else{[...filtered].reverse().forEach(b=>listCard.appendChild(buildBetRow(b)));}
+  div.appendChild(listCard);
+  div.appendChild(el("div","","SALVATO • "+state.bets.length+" SCOMMESSE",[["textAlign","center"],["fontSize","9px"],["color","#1e293b"],["padding","14px"],["letterSpacing",".12em"]]));
+  return div;
+}
+
+// ── BET ROW ───────────────────────────────────────────────────────────────────
+function buildBetRow(bet){
+  const isPending=bet.result==="pending";
+  const catColor=CATS[bet.category]||"#64748b";
+  const profit=bet.result==="win"?bet.stake*(bet.odds-1):bet.result==="loss"?-bet.stake:null;
+  let countdown=null,isLive=false;
+  if(isPending&&bet.matchDate){const tgt=new Date(`${bet.matchDate}T${bet.matchTime||"00:00"}:00`);const diff=tgt-Date.now();countdown=Math.max(diff,0);isLive=diff<=0;}
+  const isMultiple=bet.type==="multiple";
+  const isExpanded=state.expandedBet===bet.id;
+  const row=el("div","bet-row");
+  // Tags
+  const tags=el("div","",[["display","flex"],["gap","6px"],["marginBottom","7px"],["flexWrap","wrap"],["alignItems","center"]]);
+  if(isMultiple){
+    const mt=el("span","tag","✦ MULTIPLA "+(bet.legs&&bet.legs.length?bet.legs.length:"")+" LEG",[["background","#f97316"+"22"],["color","#f97316"],["border","1px solid #f9731644"]]);
+    tags.appendChild(mt);
+  }
+  tags.appendChild(el("span","tag",bet.category,[["background",catColor+"22"],["color",catColor],["border","1px solid "+catColor+"44"]]));
+  const rc=bet.result==="win"?"#22c55e":bet.result==="loss"?"#ef4444":isLive?"#ef4444":"#f59e0b";
+  const rl=bet.result==="win"?"✓ WIN":bet.result==="loss"?"✗ LOSS":isLive?"🔴 LIVE":"⏳";
+  tags.appendChild(el("span","tag",rl,[["background",rc+"11"],["color",rc],["border","1px solid "+rc+"33"]]));
+  tags.appendChild(el("span","",fmtDate(bet.date),[["fontSize","10px"],["color","#475569"]]));
+  row.appendChild(tags);
+  // Description + expand toggle for multiple
+  const descRow=el("div","",[["display","flex"],["justifyContent","space-between"],["alignItems","center"],["marginBottom","5px"]]);
+  descRow.appendChild(el("div","",bet.description,[["fontSize","14px"],["color","#cbd5e1"],["flex","1"]]));
+  if(isMultiple){
+    const tog=el("button","",isExpanded?"▲ chiudi":"▼ "+bet.legs.length+" partite",[["background","transparent"],["border","1px solid #1e2533"],["color","#475569"],["borderRadius","6px"],["padding","3px 8px"],["fontSize","10px"],["cursor","pointer"],["fontFamily","inherit"],["flexShrink","0"],["marginLeft","8px"]]);
+    tog.dataset.expand=bet.id;descRow.appendChild(tog);
+  }
+  row.appendChild(descRow);
+  // Meta
+  const meta=el("div","",[["fontSize","11px"],["color","#475569"]]);
+  meta.innerHTML=`Stake: <span style="color:#94a3b8">${fmt(bet.stake)}</span> | Quota: <span style="color:#94a3b8">${bet.odds.toFixed(3)}</span>`;
+  if(profit!==null){const pc=profit>=0?"#22c55e":"#ef4444";meta.innerHTML+=` | <span style="color:${pc};font-weight:700">${profit>=0?"+":""}${fmt(profit)}</span>`;}
+  if(isPending)meta.innerHTML+=` | <span style="color:#22c55e">Pot. +${fmt(bet.stake*(bet.odds-1))}</span>`;
+  row.appendChild(meta);
+  // Countdown
+  if(isPending&&countdown!==null){
+    const cd=el("div","",[["marginTop","6px"],["fontSize","11px"],["color",isLive?"#ef4444":"#f59e0b"],["display","flex"],["alignItems","center"],["gap","5px"]]);
+    if(isLive){const dot=el("span","",[["width","7px"],["height","7px"],["borderRadius","50%"],["background","#ef4444"],["display","inline-block"],["animation","pulse 1s infinite"],["flexShrink","0"]]);cd.appendChild(dot);cd.appendChild(document.createTextNode(" Partita in corso!"));}
+    else cd.textContent="⏰ Inizio tra: "+fmtCd(countdown);
+    row.appendChild(cd);
+  }
+  // Legs expanded
+  if(isMultiple&&isExpanded&&bet.legs&&bet.legs.length){
+    const legsDiv=el("div","",[["marginTop","10px"],["background","#080b10"],["borderRadius","8px"],["padding","10px"],["border","1px solid #1e2533"]]);
+    bet.legs.forEach((l,i)=>{
+      const lr=el("div","",[["display","flex"],["alignItems","center"],["gap","8px"],["padding","6px 0"],["borderBottom",i<bet.legs.length-1?"1px solid #1e253844":"none"],["flexWrap","wrap"]]);
+      lr.appendChild(el("span","","#"+(i+1),[["fontSize","10px"],["color","#334155"],["width","18px"],["flexShrink","0"]]));
+      lr.appendChild(el("span","",l.match,[["fontSize","12px"],["color","#94a3b8"],["flex","1"],["minWidth","80px"]]));
+      lr.appendChild(el("span","",l.pick,[["fontSize","11px"],["color","#22c55e"]]));
+      if(l.odds)lr.appendChild(el("span","","@"+parseFloat(l.odds).toFixed(2),[["fontSize","11px"],["color","#f59e0b"]]));
+      legsDiv.appendChild(lr);
+    });
+    row.appendChild(legsDiv);
+  }
+  // Actions
+  const actions=el("div","",[["display","flex"],["gap","7px"],["marginTop","12px"],["flexWrap","wrap"]]);
+  if(isPending){
+    const wb=el("button","action-btn","✓ WIN",[["background","#22c55e"],["color","#0a0a0f"],["padding","9px 16px"]]);wb.dataset.action="win";wb.dataset.id=bet.id;
+    const lb=el("button","action-btn","✗ LOSS",[["background","#ef444422"],["color","#ef4444"],["border","1px solid #ef444444"],["padding","9px 16px"]]);lb.dataset.action="loss";lb.dataset.id=bet.id;
+    actions.appendChild(wb);actions.appendChild(lb);
+  }
+  const eb=el("button","action-btn","Edit",[["background","transparent"],["color","#64748b"],["border","1px solid #1e2533"],["padding","9px 14px"]]);eb.dataset.action="edit";eb.dataset.id=bet.id;
+  const db=el("button","action-btn","✕",[["background","transparent"],["color","#ef444488"],["border","1px solid #ef444422"],["padding","9px 12px"]]);db.dataset.action="delete";db.dataset.id=bet.id;
+  actions.appendChild(eb);actions.appendChild(db);
+  row.appendChild(actions);
+  return row;
+}
+
+// ── ADD TAB ───────────────────────────────────────────────────────────────────
+function buildAddTab(){
+  const div=el("div","",[["padding","16px"]]);
+  div.appendChild(el("div","tk",state.editId?"Modifica":"Nuova Scommessa",[["fontSize","24px"],["color","#22c55e"],["marginBottom","16px"]]));
+  // Type toggle
+  const tt=el("div","type-toggle");
+  ["single","multiple"].forEach(t=>{
+    const b=el("button","type-btn"+(state.form.type===t?" active":""),t==="single"?"⚽ SINGOLA":"✦ MULTIPLA");
+    b.dataset.settype=t;tt.appendChild(b);
+  });
+  div.appendChild(tt);
+  if(state.form.type==="single"){
+    div.appendChild(buildSingleForm("f-"));
+  } else {
+    div.appendChild(buildMultipleForm("f-"));
+  }
+  return div;
+}
+
+// ── SINGLE FORM ───────────────────────────────────────────────────────────────
+function buildSingleForm(pfx){
+  const div=el("div");
+  div.appendChild(field("Descrizione",inp(pfx+"desc","text","Es: Juventus vs Milan — 1X",state.form.description)));
+  const r1=el("div","g2",[["marginBottom","12px"]]);
+  r1.appendChild(field("Categoria",sel(pfx+"cat",Object.keys(CATS),state.form.category),"0"));
+  r1.appendChild(field("Data",inp(pfx+"date","date","",state.form.date),"0"));
+  div.appendChild(r1);
+  const r2=el("div","g2",[["marginBottom","12px"]]);
+  r2.appendChild(field("Stake (€)",inp(pfx+"stake","number","200",state.form.stake,{min:0,step:1}),"0"));
+  r2.appendChild(field("Quota",inp(pfx+"odds","number","1.85",state.form.odds,{min:1,step:0.01}),"0"));
+  div.appendChild(r2);
+  div.appendChild(buildResultBtns(pfx));
+  div.appendChild(buildTimerBox(pfx));
+  div.appendChild(buildPreview());
+  div.appendChild(buildSubmitRow());
+  return div;
+}
+
+// ── MULTIPLE FORM ─────────────────────────────────────────────────────────────
+function buildMultipleForm(pfx){
+  const div=el("div");
+  // Legs
+  state.form.legs.forEach((leg,i)=>{
+    div.appendChild(buildLegCard(i));
+  });
+  // Add leg button
+  const addLeg=el("button","btn btns","+ Aggiungi Partita",[["width","100%"],["marginBottom","14px"],["padding","12px 0"]]);
+  addLeg.id="btn-add-leg";div.appendChild(addLeg);
+  // Description (optional)
+  div.appendChild(field("Nome Multipla (opz.)",inp(pfx+"desc","text","Es: Doppia Calcio",state.form.description)));
+  // Stake
+  div.appendChild(field("Stake (€)",inp(pfx+"stake","number","100",state.form.stake,{min:0,step:1})));
+  // Odds preview
+  const od=totalOdds(state.form.legs);
+  const ob=el("div","odds-box");
+  const r1=el("div","",[["display","flex"],["justifyContent","space-between"],["marginBottom","6px"]]);
+  r1.appendChild(el("span","","Tipo",[["fontSize","12px"],["color","#475569"]]));
+  r1.appendChild(el("span","tk","MULTIPLA "+state.form.legs.length+" EVENTI",[["fontSize","18px"],["color","#f97316"]]));
+  ob.appendChild(r1);
+  const r2=el("div","",[["display","flex"],["justifyContent","space-between"],["marginBottom",state.form.stake?"6px":"0"]]);
+  r2.appendChild(el("span","","Quota Totale",[["fontSize","12px"],["color","#475569"]]));
+  r2.appendChild(el("span","tk",od.toFixed(3),[["fontSize","22px"],["color","#f59e0b"]]));
+  ob.appendChild(r2);
+  if(state.form.stake){
+    const r3=el("div","",[["display","flex"],["justifyContent","space-between"]]);
+    r3.appendChild(el("span","","Vincita Potenziale",[["fontSize","12px"],["color","#475569"]]));
+    r3.appendChild(el("span","tk","+"+fmt(+state.form.stake*(od-1)),[["fontSize","22px"],["color","#22c55e"]]));
+    ob.appendChild(r3);
+  }
+  div.appendChild(ob);
+  // Data
+  div.appendChild(field("Data",inp(pfx+"date","date","",state.form.date)));
+  div.appendChild(buildResultBtns(pfx));
+  div.appendChild(buildTimerBox(pfx));
+  div.appendChild(buildSubmitRow());
+  return div;
+}
+
+function buildLegCard(i){
+  const leg=state.form.legs[i];
+  const card=el("div","leg-card");
+  const hdr=el("div","leg-card-header");
+  hdr.appendChild(el("span","leg-num","LEG "+(i+1)));
+  if(state.form.legs.length>1){
+    const rm=el("button","btn btnr","✕ Rimuovi",[["padding","5px 10px"],["fontSize","10px"]]);
+    rm.dataset.removeLeg=i;hdr.appendChild(rm);
+  }
+  card.appendChild(hdr);
+  const r1=el("div","g2",[["marginBottom","10px"]]);
+  const mi=inp("leg-match-"+i,"text","Es: Juve vs Milan",leg.match);r1.appendChild(field("Partita",mi,"0"));
+  const pi=inp("leg-pick-"+i,"text","Es: 1X, Over 2.5",leg.pick);r1.appendChild(field("Pronostico",pi,"0"));
+  card.appendChild(r1);
+  const r2=el("div","g2");
+  const ci=sel("leg-cat-"+i,Object.keys(CATS),leg.category);r2.appendChild(field("Sport",ci,"0"));
+  const oi=inp("leg-odds-"+i,"number","1.85",leg.odds,{min:1,step:0.01});r2.appendChild(field("Quota",oi,"0"));
+  card.appendChild(r2);
+  return card;
+}
+
+function buildResultBtns(pfx){
+  const wrap=el("div","",[["marginBottom","14px"]]);
+  wrap.appendChild(el("div","lbl","Risultato"));
+  const row=el("div","",[["display","flex"],["gap","8px"]]);
+  ["pending","win","loss"].forEach(r=>{
+    const isA=state.form.result===r;
+    const bg=isA?(r==="win"?"#22c55e":r==="loss"?"#ef4444":"#f59e0b"):"transparent";
+    const col=isA?"#0a0a0f":(r==="win"?"#22c55e":r==="loss"?"#ef4444":"#f59e0b");
+    const b=el("button","btn",r==="pending"?"⏳ Pending":r==="win"?"✓ WIN":"✗ LOSS",[["flex","1"],["background",bg],["color",col],["border","1px solid "+(r==="win"?"#22c55e44":r==="loss"?"#ef444444":"#f59e0b44")],["padding","12px 0"],["fontSize","11px"]]);
+    b.dataset.result=r;row.appendChild(b);
+  });
+  wrap.appendChild(row);return wrap;
+}
+
+function buildTimerBox(pfx){
+  if(state.form.result!=="pending")return el("div");
+  const box=el("div","",[["background","#080b10"],["border","1px solid #f59e0b22"],["borderRadius","10px"],["padding","14px"],["marginBottom","14px"]]);
+  box.appendChild(el("div","","⏰ TIMER PARTITA (opzionale)",[["fontSize","10px"],["color","#f59e0b"],["letterSpacing",".12em"],["marginBottom","10px"]]));
+  const r=el("div","g2");
+  r.appendChild(field("Data partita",inp(pfx+"matchDate","date","",state.form.matchDate),"0"));
+  r.appendChild(field("Orario",inp(pfx+"matchTime","time","",state.form.matchTime),"0"));
+  box.appendChild(r);
+  box.appendChild(el("div","","Diventerà 🔴 LIVE all'orario inserito",[["fontSize","10px"],["color","#475569"],["marginTop","8px"]]));
+  return box;
+}
+
+function buildPreview(){
+  if(!state.form.stake||!state.form.odds)return el("div");
+  const s=+state.form.stake,o=+state.form.odds,r=state.form.result;
+  const box=el("div","",[["background","#0a0a0f"],["border","1px solid #1e2533"],["borderRadius","8px"],["padding","12px 16px"],["fontSize","13px"],["marginBottom","14px"]]);
+  if(r==="win"||r==="pending")box.innerHTML=`<span style="color:#475569">Vincita pot.: </span><span style="color:#22c55e;font-weight:700">+${fmt(s*(o-1))}</span>`;
+  else box.innerHTML=`<span style="color:#475569">Perdita: </span><span style="color:#ef4444;font-weight:700">-${fmt(s)}</span>`;
+  return box;
+}
+
+function buildSubmitRow(){
+  const row=el("div","",[["display","flex"],["gap","10px"],["marginTop","4px"]]);
+  if(state.editId){const c=el("button","btn btns","Annulla",[["flex","1"],["padding","14px 0"]]);c.id="btn-cancel-edit";row.appendChild(c);}
+  const s=el("button","btn btng",state.editId?"Salva Modifiche":"✓ Aggiungi Scommessa",[["flex","2"],["padding","14px 0"],["fontSize","13px"]]);
+  s.id="btn-submit";row.appendChild(s);return row;
+}
+
+// ── MODAL (edit overlay) ──────────────────────────────────────────────────────
+function buildModal(){
+  const ov=el("div","overlay");ov.id="overlay";
+  const modal=el("div","modal");
+  modal.appendChild(el("div","modal-handle"));
+  modal.appendChild(el("div","tk","Modifica Scommessa",[["fontSize","22px"],["color","#22c55e"],["marginBottom","16px"]]));
+  const tt=el("div","type-toggle");
+  ["single","multiple"].forEach(t=>{
+    const b=el("button","type-btn"+(state.form.type===t?" active":""),t==="single"?"⚽ SINGOLA":"✦ MULTIPLA");
+    b.dataset.settype=t;tt.appendChild(b);
+  });
+  modal.appendChild(tt);
+  if(state.form.type==="single")modal.appendChild(buildSingleForm("m-"));
+  else modal.appendChild(buildMultipleForm("m-"));
+  ov.appendChild(modal);return ov;
+}
+
+// ── BOTTOM NAV ────────────────────────────────────────────────────────────────
+function buildBottomNav(){
+  const nav=el("div","bnav");
+  [{ico:"📊",label:"Dashboard",t:0},{ico:"🎯",label:"Scommesse",t:1},{ico:"➕",label:"Aggiungi",t:2}].forEach(tab=>{
+    const btn=el("div","bnav-btn"+(state.tab===tab.t?" active":""));
+    btn.appendChild(el("span","ico",tab.ico));btn.appendChild(el("span","",tab.label));btn.dataset.tab=tab.t;nav.appendChild(btn);
+  });
+  return nav;
+}
+
+// ── COLLECT FORM DATA ─────────────────────────────────────────────────────────
+function collectFormData(pfx){
+  const g=id=>{const e=document.getElementById(pfx+id);return e?e.value:null;};
+  if(g("desc")!==null)state.form.description=g("desc");
+  if(g("cat")!==null)state.form.category=g("cat");
+  if(g("date")!==null)state.form.date=g("date");
+  if(g("stake")!==null)state.form.stake=g("stake");
+  if(g("odds")!==null)state.form.odds=g("odds");
+  if(g("matchDate")!==null)state.form.matchDate=g("matchDate");
+  if(g("matchTime")!==null)state.form.matchTime=g("matchTime");
+  // Collect legs
+  state.form.legs=state.form.legs.map((leg,i)=>{
+    const m=document.getElementById("leg-match-"+i);
+    const p=document.getElementById("leg-pick-"+i);
+    const c=document.getElementById("leg-cat-"+i);
+    const o=document.getElementById("leg-odds-"+i);
+    return{match:m?m.value:leg.match,pick:p?p.value:leg.pick,category:c?c.value:leg.category,odds:o?o.value:leg.odds};
+  });
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+function attachEvents(){
+  const app=document.getElementById("app");
+  app.addEventListener("click",e=>{
+    const t=e.target.closest("[data-tab],[data-filter],[data-result],[data-action],[data-expand],[data-settype],[data-removeLeg],[id]")||e.target;
+
+    // Bottom nav
+    if(t.closest&&t.closest(".bnav-btn")){
+      const tab=+t.closest(".bnav-btn").dataset.tab;
+      if(tab===2&&!state.showForm){state.editId=null;state.form=emptyForm();}
+      state.tab=tab;state.showForm=false;render();return;
+    }
+    // Filter
+    if(t.dataset&&t.dataset.filter){state.filter=t.dataset.filter;render();return;}
+    // Type toggle (single/multiple)
+    if(t.dataset&&t.dataset.settype){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);
+      state.form.type=t.dataset.settype;
+      if(state.form.legs.length===0)state.form.legs=[emptyLeg()];
+      render();return;
+    }
+    // Result buttons
+    if(t.dataset&&t.dataset.result){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);
+      state.form.result=t.dataset.result;render();return;
+    }
+    // Expand leg details
+    if(t.dataset&&t.dataset.expand){
+      const id=+t.dataset.expand;
+      state.expandedBet=state.expandedBet===id?null:id;render();return;
+    }
+    // Remove leg
+    if(t.dataset&&t.dataset.removeLeg!==undefined){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);
+      const idx=+t.dataset.removeLeg;
+      state.form.legs=state.form.legs.filter((_,i)=>i!==idx);render();return;
+    }
+    // Add leg
+    if(t.id==="btn-add-leg"){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);
+      state.form.legs=[...state.form.legs,emptyLeg()];render();return;
+    }
+    // Bet actions
+    if(t.dataset&&t.dataset.action){
+      const id=+t.dataset.id;
+      if(t.dataset.action==="win"){setResult(id,"win");return;}
+      if(t.dataset.action==="loss"){setResult(id,"loss");return;}
+      if(t.dataset.action==="edit"){const b=state.bets.find(x=>x.id===id);if(b){state.showForm=true;state.tab=2;editBet(b);return;}}
+      if(t.dataset.action==="delete"){deleteBet(id);return;}
+    }
+    // Submit
+    if(t.id==="btn-submit"){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);submitForm();return;
+    }
+    if(t.id==="btn-save"){collectFormData("m-");submitForm();return;}
+    if(t.id==="btn-cancel"||t.id==="btn-cancel-edit"){closeForm();state.tab=1;render();return;}
+    if(t.id==="overlay"){closeForm();render();return;}
+  });
+
+  // Live input updates for odds preview
+  app.addEventListener("input",e=>{
+    const id=e.target.id;
+    if(id.startsWith("leg-odds-")||id==="f-stake"||id==="f-odds"||id==="m-stake"||id==="m-odds"){
+      const pfx=state.showForm?"m-":"f-";
+      collectFormData(pfx);render();
+    }
+    if(id==="f-desc")state.form.description=e.target.value;
+    if(id==="m-desc")state.form.description=e.target.value;
+  });
+}
+
+render();
+</script>
+</body>
+</html>
